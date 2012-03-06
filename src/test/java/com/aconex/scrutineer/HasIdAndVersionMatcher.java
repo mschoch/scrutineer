@@ -9,16 +9,16 @@ public class HasIdAndVersionMatcher extends TypeSafeMatcher<IdAndVersion> {
 
     private final String id;
 
-    private final long version;
+    private final String version;
 
-    public HasIdAndVersionMatcher(String id, long version) {
+    public HasIdAndVersionMatcher(String id, String version) {
         this.id = id;
         this.version = version;
     }
 
     @Override
     public boolean matchesSafely(IdAndVersion idAndVersion) {
-        return idAndVersion.getId().endsWith(id) && idAndVersion.getVersion() == version;
+        return idAndVersion.getId().endsWith(id) && idAndVersion.getVersion().equals(version);
     }
 
     @Override
@@ -27,7 +27,7 @@ public class HasIdAndVersionMatcher extends TypeSafeMatcher<IdAndVersion> {
     }
 
     @Factory
-    public static <T>Matcher<IdAndVersion> hasIdAndVersion(String id, long version) {
+    public static <T>Matcher<IdAndVersion> hasIdAndVersion(String id, String version) {
         return new HasIdAndVersionMatcher(id,version);
     }
 }

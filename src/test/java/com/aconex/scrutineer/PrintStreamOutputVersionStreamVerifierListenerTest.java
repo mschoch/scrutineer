@@ -1,18 +1,18 @@
 package com.aconex.scrutineer;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+
+import java.io.PrintStream;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.io.PrintStream;
-
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-
 public class PrintStreamOutputVersionStreamVerifierListenerTest {
 
-    private final IdAndVersion idAndVersion = new IdAndVersion("1", 10);
+    private final IdAndVersion idAndVersion = new IdAndVersion("1", "10");
 
     @Mock
     private PrintStream printStream;
@@ -42,7 +42,7 @@ public class PrintStreamOutputVersionStreamVerifierListenerTest {
     @Test
     public void testOnVersionMisMatch() throws Exception {
         PrintStreamOutputVersionStreamVerifierListener streamVerifierListener = new PrintStreamOutputVersionStreamVerifierListener(printStream);
-        streamVerifierListener.onVersionMisMatch(idAndVersion, new IdAndVersion("1",9));
+        streamVerifierListener.onVersionMisMatch(idAndVersion, new IdAndVersion("1","9"));
         verify(printStream).println("MISMATCH\t1\t10\tsecondaryVersion=9");
         verifyNoMoreInteractions(printStream);
     }

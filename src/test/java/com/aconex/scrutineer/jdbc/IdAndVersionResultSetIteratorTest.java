@@ -19,7 +19,9 @@ import org.mockito.Mock;
 public class IdAndVersionResultSetIteratorTest {
 
     private static final String ID = "ID";
-    private static final long VERSION = 123L;
+    private static final String VERSION = "123";
+    private static final Long LONG_VERSION = 123L;
+    private static final Timestamp TIMESTAMP_VERSION = new Timestamp(123);
 
     @Mock
     private ResultSet resultSet;
@@ -37,7 +39,7 @@ public class IdAndVersionResultSetIteratorTest {
         when(resultSet.next()).thenReturn(true);
         when(resultSet.getMetaData()).thenReturn(metaData);
         when(metaData.getColumnType(2)).thenReturn(Types.TIMESTAMP);
-        when(resultSet.getTimestamp(2)).thenReturn(new Timestamp(VERSION));
+        when(resultSet.getTimestamp(2)).thenReturn(TIMESTAMP_VERSION);
 
         IdAndVersionResultSetIterator idAndVersionResultSetIterator = new IdAndVersionResultSetIterator(resultSet);
         assertThat(idAndVersionResultSetIterator.hasNext(), is(true));
@@ -48,7 +50,7 @@ public class IdAndVersionResultSetIteratorTest {
         when(resultSet.next()).thenReturn(false);
         when(resultSet.getMetaData()).thenReturn(metaData);
         when(metaData.getColumnType(2)).thenReturn(Types.TIMESTAMP);
-        when(resultSet.getTimestamp(2)).thenReturn(new Timestamp(VERSION));
+        when(resultSet.getTimestamp(2)).thenReturn(TIMESTAMP_VERSION);
 
         IdAndVersionResultSetIterator idAndVersionResultSetIterator = new IdAndVersionResultSetIterator(resultSet);
         assertThat(idAndVersionResultSetIterator.hasNext(), is(false));
@@ -60,7 +62,7 @@ public class IdAndVersionResultSetIteratorTest {
         when(metaData.getColumnType(2)).thenReturn(Types.TIMESTAMP);
         when(resultSet.next()).thenReturn(true).thenReturn(false);
         when(resultSet.getString(1)).thenReturn(ID);
-        when(resultSet.getTimestamp(2)).thenReturn(new Timestamp(VERSION));
+        when(resultSet.getTimestamp(2)).thenReturn(TIMESTAMP_VERSION);
 
         IdAndVersionResultSetIterator idAndVersionResultSetIterator = new IdAndVersionResultSetIterator(resultSet);
         assertThat(idAndVersionResultSetIterator.next(), hasIdAndVersion(ID,VERSION));
@@ -73,7 +75,7 @@ public class IdAndVersionResultSetIteratorTest {
         when(metaData.getColumnType(2)).thenReturn(Types.BIGINT);
         when(resultSet.next()).thenReturn(true).thenReturn(false);
         when(resultSet.getString(1)).thenReturn(ID);
-        when(resultSet.getLong(2)).thenReturn(VERSION);
+        when(resultSet.getLong(2)).thenReturn(LONG_VERSION);
 
         IdAndVersionResultSetIterator idAndVersionResultSetIterator = new IdAndVersionResultSetIterator(resultSet);
         assertThat(idAndVersionResultSetIterator.next(), hasIdAndVersion(ID,VERSION));

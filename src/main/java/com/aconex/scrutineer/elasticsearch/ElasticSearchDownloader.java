@@ -63,7 +63,7 @@ public class ElasticSearchDownloader {
     boolean writeSearchResponseToOutputStream(ObjectOutputStream objectOutputStream, SearchResponse searchResponse) throws IOException {
         SearchHit[] hits = searchResponse.getHits().hits();
         for (SearchHit hit : hits) {
-            new IdAndVersion(hit.getId(), hit.getVersion()).writeToStream(objectOutputStream);
+            new IdAndVersion(hit.getId(), new Long(hit.getVersion()).toString()).writeToStream(objectOutputStream);
             numItems++;
         }
         return hits.length > 0;

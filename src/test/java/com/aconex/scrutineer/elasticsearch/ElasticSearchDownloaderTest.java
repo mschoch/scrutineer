@@ -37,8 +37,9 @@ import org.mockito.Mock;
 public class ElasticSearchDownloaderTest {
 
     private static final String INDEX_NAME = "indexName";
-    private static final String ID = "123";
-    private static final long VERSION = 123L;
+    private static final String ID = "abc";
+    private static final Long VERSION = 123L;
+    private static final String STRING_VERSION = "123";
     private static final String QUERY = "*";
     @Mock
     private Client client;
@@ -105,7 +106,7 @@ public class ElasticSearchDownloaderTest {
         when(hit.getVersion()).thenReturn(VERSION);
         assertThat(elasticSearchDownloader.writeSearchResponseToOutputStream(objectOutputStream, searchResponse), is(true));
         verify(objectOutputStream).writeUTF(ID);
-        verify(objectOutputStream).writeLong(VERSION);
+        verify(objectOutputStream).writeUTF(STRING_VERSION);
         verifyNoMoreInteractions(objectOutputStream);
     }
 

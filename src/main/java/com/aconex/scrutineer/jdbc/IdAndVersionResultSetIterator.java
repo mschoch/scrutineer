@@ -5,8 +5,9 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Iterator;
 
-import com.aconex.scrutineer.IdAndVersion;
 import org.apache.commons.lang.NotImplementedException;
+
+import com.aconex.scrutineer.IdAndVersion;
 
 public class IdAndVersionResultSetIterator implements Iterator<IdAndVersion> {
 
@@ -59,13 +60,27 @@ public class IdAndVersionResultSetIterator implements Iterator<IdAndVersion> {
                 throw new UnsupportedOperationException(String.format("Do not know how to handle version column type (java.sql.Type value=%d", columnClass));
         }
     }
+
+    private String getVersionValueAnString() throws SQLException {
+        switch (this.columnClass) {
+        case Types.TIMESTAMP:
+            return new Long(resultSet.getTimestamp(2).getTime()).toString();
+
+        case Types.BIGINT:
+        case Types.INTEGER:
+            return new Long(resultSet.getLong(2)).toString();
+        default:
+            throw new UnsupportedOperationException(String.format("Do not know how to handle version column type (java.sql.Type value=%d", columnClass));
+    }
+    }
+
     //CHECKSTYLE:ON
 
     @SuppressWarnings("PMD.NcssMethodCount")
     private void nextRow() {
         try {
             if (resultSet.next()) {
-                current = new IdAndVersion(resultSet.getString(1), getVersionValueAnLong());
+                current = new IdAndVersion(resultSet.getString(1), getVersionValueAnString());
             } else {
                 current = null;
             }

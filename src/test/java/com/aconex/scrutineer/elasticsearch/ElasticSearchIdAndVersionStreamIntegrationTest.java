@@ -59,9 +59,9 @@ public class ElasticSearchIdAndVersionStreamIntegrationTest {
         elasticSearchIdAndVersionStream.open();
         Iterator<IdAndVersion> iterator = elasticSearchIdAndVersionStream.iterator();
 
-        assertThat(iterator.next(), hasIdAndVersion("1",1));
-        assertThat(iterator.next(), hasIdAndVersion("2",2));
-        assertThat(iterator.next(), hasIdAndVersion("3",3));
+        assertThat(iterator.next(), hasIdAndVersion("1","1"));
+        assertThat(iterator.next(), hasIdAndVersion("2","2"));
+        assertThat(iterator.next(), hasIdAndVersion("3","3"));
 
         elasticSearchIdAndVersionStream.close();
     }

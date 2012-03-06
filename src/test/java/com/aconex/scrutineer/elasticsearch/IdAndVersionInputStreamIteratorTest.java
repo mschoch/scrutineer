@@ -6,16 +6,17 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 
-import com.aconex.scrutineer.IdAndVersion;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import com.aconex.scrutineer.IdAndVersion;
+
 public class IdAndVersionInputStreamIteratorTest {
 
     private static final String ID = "12";
-    private static final long VERSION = 77L;
+    private static final String VERSION = "77";
     @Mock
     private IdAndVersionDataReader idAndVersionDataReader;
 

@@ -1,3 +1,23 @@
+This is a version of Scrutineer that has been modified to support Couchbase 2.0 as the system of record.
+
+Changes from the Original
+=========================
+- Version field is now String (Couchbase CAS value) instead of long
+- Additional property from ES source document can be referenced instead of built-in version
+
+Example Usage
+=============
+
+    bin/scrutineer --clusterName elasticsearch --indexName my_db_index2 --couchbaseURL http://127.0.0.1:5984 --couchbaseBucket default --elasticSearchRevField _rev
+
+This will pull source key/revisions from http://127.0.0.1:5984/default/_all_docs in batches of 10000.
+It will then query key/revision from an ES cluster named "elasticsearch".  Further the revision information will be pulled from the "_rev" field inside the document source.
+
+
+Original README follows below this point unmodified
+===================================================
+
+
 Analyses a secondary stream of information against a known point-of-truth and reports inconsistencies.
 
 The Why

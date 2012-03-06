@@ -95,7 +95,7 @@ public class Scrutineer {
     ElasticSearchIdAndVersionStream createElasticSearchIdAndVersionStream(ScrutineerCommandLineOptions options) {
         this.node = nodeBuilder().client(true).clusterName(options.clusterName).node();
         this.client = node.client();
-        return new ElasticSearchIdAndVersionStream(new ElasticSearchDownloader(client, options.indexName, options.query), new ElasticSearchSorter(createSorter()), new IteratorFactory(), SystemUtils.getJavaIoTmpDir().getAbsolutePath());
+        return new ElasticSearchIdAndVersionStream(new ElasticSearchDownloader(client, options.indexName, options.query, options.elasticSearchRevField), new ElasticSearchSorter(createSorter()), new IteratorFactory(), SystemUtils.getJavaIoTmpDir().getAbsolutePath());
     }
 
     private Sorter<IdAndVersion> createSorter() {
@@ -152,6 +152,9 @@ public class Scrutineer {
 
         @Parameter(names = "--sql", description = "SQL used to create Primary stream, which should return results in _lexicographical_ order", required = true)
         public String sql;
+
+        @Parameter(names = "--elasticSearchRevField", description = "Elastic Search Source Field to use as the revision", required = false)
+        public String elasticSearchRevField;
     }
     // CHECKSTYLE:ON
 

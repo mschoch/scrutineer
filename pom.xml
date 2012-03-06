@@ -149,6 +149,16 @@ cluster contains correct information from a JDBC source.
             <version>${slf4j.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+        <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-core-asl</artifactId>
+            <version>1.8.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>1.8.6</version>
+         </dependency>
     </dependencies>
 
     <build>

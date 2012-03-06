@@ -1,11 +1,13 @@
 package com.aconex.scrutineer.elasticsearch;
 
-import com.aconex.scrutineer.IdAndVersion;
-import com.fasterxml.sort.DataReaderFactory;
-import com.fasterxml.sort.DataWriterFactory;
-import com.fasterxml.sort.SortConfig;
-import com.fasterxml.sort.Sorter;
-import com.fasterxml.sort.util.NaturalComparator;
+import static com.aconex.scrutineer.HasIdAndVersionMatcher.hasIdAndVersion;
+import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
+import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import java.io.IOException;
+import java.util.Iterator;
+
 import org.apache.commons.lang.SystemUtils;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.VersionType;
@@ -14,11 +16,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Iterator;
-
-import static com.aconex.scrutineer.HasIdAndVersionMatcher.hasIdAndVersion;
-import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
-import static org.hamcrest.MatcherAssert.assertThat;
+import com.aconex.scrutineer.IdAndVersion;
+import com.fasterxml.sort.DataReaderFactory;
+import com.fasterxml.sort.DataWriterFactory;
+import com.fasterxml.sort.SortConfig;
+import com.fasterxml.sort.Sorter;
+import com.fasterxml.sort.util.NaturalComparator;
 
 public class ElasticSearchIdAndVersionStreamIntegrationTest {
 
@@ -27,7 +30,7 @@ public class ElasticSearchIdAndVersionStreamIntegrationTest {
     private ElasticSearchTestHelper elasticSearchTestHelper;
 
     @Before
-    public void setup() {
+    public void setup() throws IOException {
         Node node = nodeBuilder().local(true).node();
         client = node.client();
         deleteIndexIfExists();
@@ -52,7 +55,7 @@ public class ElasticSearchIdAndVersionStreamIntegrationTest {
         DataReaderFactory<IdAndVersion> dataReaderFactory = new IdAndVersionDataReaderFactory();
         DataWriterFactory<IdAndVersion> dataWriterFactory = new IdAndVersionDataWriterFactory();
         Sorter sorter = new Sorter(sortConfig, dataReaderFactory, dataWriterFactory, new NaturalComparator<IdAndVersion>());
-        ElasticSearchDownloader elasticSearchDownloader = new ElasticSearchDownloader(client, INDEX_NAME, "_type:idandversion");
+        ElasticSearchDownloader elasticSearchDownloader = new ElasticSearchDownloader(client, INDEX_NAME, "_type:idandversion", "_rev");
         ElasticSearchIdAndVersionStream elasticSearchIdAndVersionStream =
                 new ElasticSearchIdAndVersionStream(elasticSearchDownloader, new ElasticSearchSorter(sorter), new IteratorFactory(), SystemUtils.getJavaIoTmpDir().getAbsolutePath());
 
@@ -71,8 +74,8 @@ public class ElasticSearchIdAndVersionStreamIntegrationTest {
         elasticSearchTestHelper.deleteIndexIfItExists(INDEX_NAME);
     }
 
-    private void indexIdAndVersion(String id, long version) {
-        client.prepareIndex(INDEX_NAME,"idandversion").setId(id).setOperationThreaded(false).setVersion(version).setVersionType(VersionType.EXTERNAL).setSource("{value:1}").execute().actionGet();
+    private void indexIdAndVersion(String id, long version) throws IOException {
+        client.prepareIndex(INDEX_NAME,"idandversion").setId(id).setOperationThreaded(false).setVersion(version+10).setVersionType(VersionType.EXTERNAL).setSource(jsonBuilder().startObject().field("_rev", new Long(version).toString()).endObject()).execute().actionGet();
     }
 
 }

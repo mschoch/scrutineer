@@ -6,6 +6,15 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import org.apache.commons.lang.SystemUtils;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
+import org.elasticsearch.client.Client;
+import org.elasticsearch.node.Node;
+
+import com.aconex.scrutineer.couchbase.CouchbaseAllDocsDownloader;
+import com.aconex.scrutineer.couchbase.CouchbaseAllDocsIdAndVersionStream;
 import com.aconex.scrutineer.elasticsearch.ElasticSearchDownloader;
 import com.aconex.scrutineer.elasticsearch.ElasticSearchIdAndVersionStream;
 import com.aconex.scrutineer.elasticsearch.ElasticSearchSorter;
@@ -21,12 +30,6 @@ import com.fasterxml.sort.DataWriterFactory;
 import com.fasterxml.sort.SortConfig;
 import com.fasterxml.sort.Sorter;
 import com.fasterxml.sort.util.NaturalComparator;
-import org.apache.commons.lang.SystemUtils;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.node.Node;
 
 public class Scrutineer {
 
@@ -54,9 +57,15 @@ public class Scrutineer {
 
     public void verify() {
         ElasticSearchIdAndVersionStream elasticSearchIdAndVersionStream = createElasticSearchIdAndVersionStream(options);
-        JdbcIdAndVersionStream jdbcIdAndVersionStream = createJdbcIdAndVersionStream(options);
 
-        verify(elasticSearchIdAndVersionStream, jdbcIdAndVersionStream, new IdAndVersionStreamVerifier());
+        if(options.jdbcURL != null) {
+            JdbcIdAndVersionStream jdbcIdAndVersionStream = createJdbcIdAndVersionStream(options);
+            verify(elasticSearchIdAndVersionStream, jdbcIdAndVersionStream, new IdAndVersionStreamVerifier());
+        }
+        else {
+            CouchbaseAllDocsIdAndVersionStream couchbaseAllDocsIdAndVersionStream = createCouchbaseAllDocsIdAndVersionStream(options);
+            verify(elasticSearchIdAndVersionStream, couchbaseAllDocsIdAndVersionStream, new IdAndVersionStreamVerifier());
+        }
     }
 
     void close() {
@@ -87,6 +96,9 @@ public class Scrutineer {
         idAndVersionStreamVerifier.verify(jdbcIdAndVersionStream, elasticSearchIdAndVersionStream, new PrintStreamOutputVersionStreamVerifierListener(System.err));
     }
 
+    void verify(ElasticSearchIdAndVersionStream elasticSearchIdAndVersionStream, CouchbaseAllDocsIdAndVersionStream jdbcIdAndVersionStream, IdAndVersionStreamVerifier idAndVersionStreamVerifier) {
+        idAndVersionStreamVerifier.verify(jdbcIdAndVersionStream, elasticSearchIdAndVersionStream, new PrintStreamOutputVersionStreamVerifierListener(System.err));
+    }
 
     public Scrutineer(ScrutineerCommandLineOptions options) {
         this.options = options;
@@ -96,6 +108,10 @@ public class Scrutineer {
         this.node = nodeBuilder().client(true).clusterName(options.clusterName).node();
         this.client = node.client();
         return new ElasticSearchIdAndVersionStream(new ElasticSearchDownloader(client, options.indexName, options.query, options.elasticSearchRevField), new ElasticSearchSorter(createSorter()), new IteratorFactory(), SystemUtils.getJavaIoTmpDir().getAbsolutePath());
+    }
+
+    CouchbaseAllDocsIdAndVersionStream createCouchbaseAllDocsIdAndVersionStream(ScrutineerCommandLineOptions options) {
+        return new CouchbaseAllDocsIdAndVersionStream(new CouchbaseAllDocsDownloader(options.couchbaseURL, options.couchbaseBucket), new IteratorFactory(), SystemUtils.getJavaIoTmpDir().getAbsolutePath());
     }
 
     private Sorter<IdAndVersion> createSorter() {
@@ -138,20 +154,26 @@ public class Scrutineer {
         @Parameter(names = "--query", description = "ElasticSearch query to create Secondary stream.  Not required to be ordered", required = false)
         public String query = "*";
 
-        @Parameter(names = "--jdbcDriverClass", description = "FQN of the JDBC Driver class", required = true)
+        @Parameter(names = "--jdbcDriverClass", description = "FQN of the JDBC Driver class", required = false)
         public String jdbcDriverClass;
 
-        @Parameter(names = "--jdbcURL", description = "JDBC URL of the Connection of the Primary source", required = true)
+        @Parameter(names = "--jdbcURL", description = "JDBC URL of the Connection of the Primary source", required = false)
         public String jdbcURL;
 
-        @Parameter(names = "--jdbcUser", description = "JDBC Username", required = true)
+        @Parameter(names = "--jdbcUser", description = "JDBC Username", required = false)
         public String jdbcUser;
 
         @Parameter(names = "--jdbcPassword", description = "JDBC Password", required = false)
         public String jdbcPassword;
 
-        @Parameter(names = "--sql", description = "SQL used to create Primary stream, which should return results in _lexicographical_ order", required = true)
+        @Parameter(names = "--sql", description = "SQL used to create Primary stream, which should return results in _lexicographical_ order", required = false)
         public String sql;
+
+        @Parameter(names = "--couchbaseURL", description = "Couchbase cluster URL", required = false)
+        public String couchbaseURL;
+
+        @Parameter(names = "--couchbaseBucket", description = "Couchbase bucket", required = false)
+        public String couchbaseBucket;
 
         @Parameter(names = "--elasticSearchRevField", description = "Elastic Search Source Field to use as the revision", required = false)
         public String elasticSearchRevField;

@@ -342,7 +342,7 @@ cluster contains correct information from a JDBC source.
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin> -->
+                    </plugin> 
 
                     <plugin>
                         <artifactId>maven-pmd-plugin</artifactId>
@@ -363,7 +363,7 @@ cluster contains correct information from a JDBC source.
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>
+                    </plugin> -->
 
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>

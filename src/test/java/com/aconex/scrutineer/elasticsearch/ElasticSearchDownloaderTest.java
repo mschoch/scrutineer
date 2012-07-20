@@ -23,8 +23,6 @@ import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.action.search.SearchRequestBuilder;
-import org.elasticsearch.client.action.search.SearchScrollRequestBuilder;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.SearchHit;
@@ -44,9 +42,9 @@ public class ElasticSearchDownloaderTest {
     @Mock
     private Client client;
     @Mock
-    private SearchRequestBuilder searchRequestBuilder;
+    private org.elasticsearch.action.search.SearchRequestBuilder searchRequestBuilder;
     @Mock
-    private SearchScrollRequestBuilder searchScrollRequestBuilder;
+    private org.elasticsearch.action.search.SearchScrollRequestBuilder searchScrollRequestBuilder;
     @Mock
     private ListenableActionFuture listenableActionFuture;
     @Mock

@@ -18,7 +18,7 @@ import com.aconex.scrutineer.LogUtils;
 public class CouchbaseAllDocsDownloader {
 
     private static final Logger LOG = LogUtils.loggerForThisClass();
-    private static final int BATCH = 10000;
+    private static final int BATCH = 1001;
 
     private long numItems = 0;
 
@@ -45,8 +45,13 @@ public class CouchbaseAllDocsDownloader {
             objectOutputStream = new ObjectOutputStream(outputStream);
 
             int numRows = -1;
+            String startKeyDocid = null;
             do {
-                URL url = new URL(String.format("%s/%s/_all_docs?limit=%d&skip=%d", host, bucket, BATCH, currentOffset));
+                String extra = "";
+                if(startKeyDocid != null) {
+                    extra = String.format("&startkey_docid=%s", startKeyDocid);
+                }
+                URL url = new URL(String.format("%s/%s/_all_docs?limit=%d%s", host, bucket, BATCH, extra));
                 LogUtils.info(LOG, "Requesting %s", url.toExternalForm());
                 URLConnection connection = url.openConnection();
                 InputStream stream = connection.getInputStream();
@@ -55,20 +60,20 @@ public class CouchbaseAllDocsDownloader {
                     List<Map<String,Object>> rows = (List)result.get("rows");
                     if(rows != null) {
                         numRows = rows.size();
-                        for (Map<String,Object> row : rows) {
+                        for (int i=0; i < numRows; i++) {
+                            Map<String,Object> row = rows.get(i);
                             String key = (String)row.get("key");
-                            Map<String,Object> value = (Map<String,Object>)row.get("value");
-                            if(value != null) {
-                                String rev = (String)value.get("rev");
-                                if(rev.contains("-")) {
-                                    int start = rev.indexOf("-")+1;
-                                    String revHex = rev.substring(start, start+16);
-
-                                    new IdAndVersion(key, revHex).writeToStream(objectOutputStream);
+                            if(i == BATCH-1) {
+                                //treat extra row differently, just set startKeyDocid
+                                startKeyDocid = key;
+                            } else {
+                                Map<String,Object> value = (Map<String,Object>)row.get("value");
+                                if(value != null) {
+                                    String rev = (String)value.get("rev");
+                                    new IdAndVersion(key, rev).writeToStream(objectOutputStream);
                                     numItems++;
                                 }
                             }
-
                         }
                     }
                 }

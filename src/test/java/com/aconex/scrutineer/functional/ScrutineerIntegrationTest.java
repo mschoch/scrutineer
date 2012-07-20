@@ -3,25 +3,27 @@ package com.aconex.scrutineer.functional;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 import static org.mockito.Mockito.verify;
 
-import javax.sql.DataSource;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URL;
+
+import javax.sql.DataSource;
+
+import org.dbunit.DataSourceBasedDBTestCase;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.xml.XmlDataSet;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.client.Client;
+import org.elasticsearch.node.Node;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import com.aconex.scrutineer.Scrutineer;
 import com.aconex.scrutineer.elasticsearch.ElasticSearchTestHelper;
 import com.aconex.scrutineer.jdbc.HSQLHelper;
 import com.google.common.io.ByteStreams;
-import org.dbunit.DataSourceBasedDBTestCase;
-import org.dbunit.dataset.IDataSet;
-import org.dbunit.dataset.xml.XmlDataSet;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.action.bulk.BulkRequestBuilder;
-import org.elasticsearch.node.Node;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 public class ScrutineerIntegrationTest extends DataSourceBasedDBTestCase {
 

@@ -105,7 +105,7 @@ public class Scrutineer {
     }
 
     ElasticSearchIdAndVersionStream createElasticSearchIdAndVersionStream(ScrutineerCommandLineOptions options) {
-        this.node = nodeBuilder().client(true).clusterName(options.clusterName).node();
+        this.node = nodeBuilder().client(true).loadConfigSettings(true).clusterName(options.clusterName).node();
         this.client = node.client();
         return new ElasticSearchIdAndVersionStream(new ElasticSearchDownloader(client, options.indexName, options.query, options.elasticSearchRevField), new ElasticSearchSorter(createSorter()), new IteratorFactory(), SystemUtils.getJavaIoTmpDir().getAbsolutePath());
     }

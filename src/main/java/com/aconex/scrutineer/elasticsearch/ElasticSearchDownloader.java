@@ -6,10 +6,10 @@ import java.io.OutputStream;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.action.search.SearchRequestBuilder;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
@@ -22,7 +22,7 @@ public class ElasticSearchDownloader {
 
     private static final Logger LOG = LogUtils.loggerForThisClass();
 
-    static final int BATCH_SIZE = 100000;
+    static final int BATCH_SIZE = 1000;
     static final int SCROLL_TIME_IN_MINUTES = 10;
     private long numItems = 0;
 
